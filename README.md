@@ -2,7 +2,6 @@
 
 >  Your web-browsing currency wingman. No more mental math when shopping online.
 
-![Vibe](https://img.shields.io/badge/vibe-immaculate-blueviolet?style=for-the-badge)
 ![Vanilla JS](https://img.shields.io/badge/built_with-vanilla_js-yellow?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-open_source-success?style=for-the-badge)
 

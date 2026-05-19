@@ -26,9 +26,7 @@ const panelSettings = document.getElementById("panelSettings");
 // Shared rates cache
 let ratesData = null;
 
-// ─────────────────────────────────────────────
 // Tabs
-// ─────────────────────────────────────────────
 function switchTab(tab) {
   if (tab === "converter") {
     tabConverter.classList.add("active");
@@ -45,9 +43,7 @@ function switchTab(tab) {
 tabConverter.addEventListener("click", () => switchTab("converter"));
 tabSettings.addEventListener("click", () => switchTab("settings"));
 
-// ─────────────────────────────────────────────
 // Settings helpers
-// ─────────────────────────────────────────────
 async function loadSettings() {
   const stored = await chrome.storage.local.get(["targetCurrency", "enabled"]);
   targetSelect.value = stored.targetCurrency || "LKR";

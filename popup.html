@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Currency Converter</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-sec: #f9fafb;
+      --border: #e5e7eb;
+      --text: #111827;
+      --text-muted: #6b7280;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 320px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg);
+    }
+    .logo {
+      width: 32px; height: 32px;
+      background: var(--bg-sec);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .header-text h1 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .header-text p  { font-size: 12px; color: var(--text-muted); }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-sec);
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px 0;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom: 2px solid var(--accent);
+      background: var(--bg);
+    }
+    .tab-btn:hover:not(.active) { color: var(--text); }
+
+    /* ── Panels ── */
+    .panel { display: none; padding: 16px; }
+    .panel.active { display: block; }
+
+    /* ── Shared Forms ── */
+    label.field-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    input[type="number"], select {
+      width: 100%;
+      padding: 8px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input[type="number"]:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    }
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='4 6 8 10 12 6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 32px;
+    }
+
+    /* ── Converter panel ── */
+    .conv-section { margin-bottom: 16px; }
+    .conv-amount-row { margin-bottom: 16px; }
+    
+    .conv-selectors {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+    }
+    .conv-selectors select { flex: 1; margin: 0; }
+
+    .swap-btn {
+      width: 34px; height: 34px; flex-shrink: 0;
+      background: var(--bg-sec);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+    .swap-btn:hover { background: #f3f4f6; color: var(--text); }
+
+    .conv-result-box {
+      background: var(--bg-sec);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+    .conv-result-label {
+      font-size: 11px; color: var(--text-muted); margin-bottom: 4px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .conv-result-value {
+      font-size: 22px; font-weight: 600; color: var(--text);
+    }
+    .conv-result-rate {
+      font-size: 12px; color: var(--text-muted); margin-top: 6px;
+    }
+
+    .conv-quick-row {
+      display: flex; gap: 6px;
+    }
+    .quick-btn {
+      flex: 1;
+      padding: 6px 0;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .quick-btn:hover {
+      border-color: var(--text-muted);
+      color: var(--text);
+    }
+
+    /* ── Settings Panel ── */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .toggle-label { font-size: 13px; font-weight: 500; color: var(--text); }
+    
+    .toggle { position: relative; width: 44px; height: 24px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #d1d5db;
+      border-radius: 24px; transition: .3s;
+    }
+    .slider:before {
+      position: absolute; content: "";
+      height: 20px; width: 20px; left: 2px; bottom: 2px;
+      background-color: white;
+      border-radius: 50%; transition: .3s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    input:checked + .slider { background-color: var(--accent); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    .rates-box {
+      margin-top: 16px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .rates-box h3 {
+      font-size: 11px; color: var(--text-muted);
+      background: var(--bg-sec);
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .rates-list-inner {
+      padding: 0 12px;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    .rate-row {
+      display: flex; justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .rate-row:last-child { border-bottom: none; }
+    .rate-from { color: var(--text-muted); }
+    .rate-val  { font-weight: 500; color: var(--text); }
+
+    .btn-apply {
+      width: 100%; padding: 10px;
+      background: var(--accent); color: #fff;
+      font-size: 14px; font-weight: 500;
+      border: none; border-radius: var(--radius);
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-apply:hover { background: var(--accent-hover); }
+
+    .status {
+      font-size: 12px; text-align: center; margin-top: 12px;
+      color: var(--text-muted);
+    }
+    .status.ok  { color: #10b981; }
+    .status.err { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">💱</div>
+    <div class="header-text">
+      <h1>Price Converter</h1>
+      <p>Real-time currency on every page</p>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tabConverter">Converter</button>
+    <button class="tab-btn"        id="tabSettings">Settings</button>
+  </div>
+
+  <!-- ── Converter Panel ── -->
+  <div class="panel active" id="panelConverter">
+    <div class="conv-section">
+      <!-- Amount input -->
+      <label class="field-label">Amount</label>
+      <div class="conv-amount-row">
+        <input class="conv-input" type="number" id="convAmount" placeholder="0.00" min="0" step="any" />
+      </div>
+
+      <!-- From / Swap / To -->
+      <label class="field-label">Currencies</label>
+      <div class="conv-selectors">
+        <select id="convFrom">
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+          <option value="GBP">GBP</option>
+          <option value="LKR">LKR</option>
+          <option value="INR">INR</option>
+          <option value="AUD">AUD</option>
+          <option value="CAD">CAD</option>
+          <option value="SGD">SGD</option>
+          <option value="AED">AED</option>
+          <option value="JPY">JPY</option>
+          <option value="KRW">KRW</option>
+          <option value="THB">THB</option>
+          <option value="CHF">CHF</option>
+        </select>
+
+        <button class="swap-btn" id="swapBtn" title="Swap currencies">⇄</button>
+
+        <select id="convTo">
+          <option value="LKR">LKR</option>
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+          <option value="GBP">GBP</option>
+          <option value="INR">INR</option>
+          <option value="AUD">AUD</option>
+          <option value="CAD">CAD</option>
+          <option value="SGD">SGD</option>
+          <option value="AED">AED</option>
+          <option value="JPY">JPY</option>
+          <option value="KRW">KRW</option>
+          <option value="THB">THB</option>
+          <option value="CHF">CHF</option>
+        </select>
+      </div>
+
+      <!-- Result -->
+      <div class="conv-result-box" id="convResultBox">
+        <div class="conv-result-label">Converted Amount</div>
+        <div class="conv-result-value" id="convResultValue">—</div>
+        <div class="conv-result-rate"  id="convResultRate"></div>
+      </div>
+
+      <!-- Quick amounts -->
+      <label class="field-label">Quick select</label>
+      <div class="conv-quick-row">
+        <button class="quick-btn" data-amount="10">10</button>
+        <button class="quick-btn" data-amount="50">50</button>
+        <button class="quick-btn" data-amount="100">100</button>
+        <button class="quick-btn" data-amount="500">500</button>
+        <button class="quick-btn" data-amount="1000">1,000</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Settings Panel ── -->
+  <div class="panel" id="panelSettings">
+    <div class="toggle-row">
+      <span class="toggle-label">Enable on this page</span>
+      <label class="toggle">
+        <input type="checkbox" id="enabledToggle" checked />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <label class="field-label">Convert prices to</label>
+    <select id="targetCurrency">
+      <option value="LKR">LKR – Sri Lankan Rupee</option>
+      <option value="USD">USD – US Dollar</option>
+      <option value="EUR">EUR – Euro</option>
+      <option value="GBP">GBP – British Pound</option>
+      <option value="INR">INR – Indian Rupee</option>
+      <option value="AUD">AUD – Australian Dollar</option>
+      <option value="CAD">CAD – Canadian Dollar</option>
+      <option value="SGD">SGD – Singapore Dollar</option>
+      <option value="AED">AED – UAE Dirham</option>
+      <option value="JPY">JPY – Japanese Yen</option>
+      <option value="KRW">KRW – Korean Won</option>
+    </select>
+
+    <div class="rates-box" id="ratesBox">
+      <h3>Live rates (base: USD)</h3>
+      <div class="rates-list-inner" id="ratesList">
+        <div class="rate-row"><span class="rate-from">Loading...</span></div>
+      </div>
+    </div>
+
+    <button class="btn-apply" id="applyBtn">Apply &amp; Refresh Page</button>
+    <div class="status" id="status">Fetching live rates…</div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
